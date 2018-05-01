@@ -61,7 +61,8 @@ private:
   Controller* mController;
 
   /// \brief Target end effector position of the robot
-  Eigen::Vector3d mTargetPosition;
+  Eigen::Vector3d mLeftTargetPosition;
+  Eigen::Vector3d mRightTargetPosition;
 
   /// \brief True to make the end effect to track a circle path
   bool mCircleTask;

@@ -4,9 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/Controller.cpp" "/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/build/CMakeFiles/LowLevelController.dir/Controller.cpp.o"
-  "/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/Main.cpp" "/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/build/CMakeFiles/LowLevelController.dir/Main.cpp.o"
-  "/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/MyWindow.cpp" "/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/build/CMakeFiles/LowLevelController.dir/MyWindow.cpp.o"
+  "/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/Controller.cpp" "/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/build/CMakeFiles/LowLevelController.dir/Controller.cpp.o"
+  "/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/Main.cpp" "/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/build/CMakeFiles/LowLevelController.dir/Main.cpp.o"
+  "/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/MyWindow.cpp" "/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/build/CMakeFiles/LowLevelController.dir/MyWindow.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

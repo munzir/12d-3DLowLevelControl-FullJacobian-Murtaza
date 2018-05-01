@@ -1,4 +1,4 @@
-# Install script for directory: /home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian
+# Install script for directory: /home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

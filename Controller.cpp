@@ -144,7 +144,7 @@ double optFunc(const std::vector<double> &x, std::vector<double> &grad, void *my
 }
 
 //=========================================================================
-void Controller::update(const Eigen::Vector3d& _targetPosition) {
+void Controller::update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::Vector3d& _RighttargetPosition) {
 
   using namespace dart;
   using namespace std;  
@@ -157,7 +157,7 @@ void Controller::update(const Eigen::Vector3d& _targetPosition) {
   // cout << "The size of q = " << q.rows() << "*" << q.cols() << endl;
   double wEER = 0.01, wEEL = 0.01, wSpeedReg = 0.001, wReg = 0.001, wPose = 0.01, wxdotReg = 0.01, wpsidotReg = 0.01; 
   Eigen::DiagonalMatrix<double, 3> wBal(10.0, 0.0, 1.0);
-  double KpxCOM = 75.0, KvxCOM = 25.0;
+  double KpxCOM = 75.0*0, KvxCOM = 25.0;
   double KvSpeedReg = 10; // Speed Reg
   double KpPose = 10.0, KvPose = 20.0;
   double kdxdotReg = 10;
@@ -193,8 +193,12 @@ void Controller::update(const Eigen::Vector3d& _targetPosition) {
            0, 0, 0;
   
   // xEEref
-  Eigen::VectorXd xEEref = xyz0 + Rot0.transpose()*_targetPosition;
-  if(mSteps == 1) { cout << "xEEref: " << xEEref(0) << ", " << xEEref(1) << ", " << xEEref(2) << endl; }
+  Eigen::VectorXd xEErefL = xyz0 + Rot0.transpose()*_LefttargetPosition;
+  Eigen::VectorXd xEErefR = xyz0 + Rot0.transpose()*_RighttargetPosition;
+  if(mSteps == 1) { 
+    cout << "xEErefL: " << xEErefL(0) << ", " << xEErefL(1) << ", " << xEErefL(2) << endl;
+    cout << "xEErefR: " << xEErefR(0) << ", " << xEErefR(1) << ", " << xEErefR(2) << endl;
+   }
   
   // ********************************* Left arm
   // Zero Columns
@@ -206,7 +210,7 @@ void Controller::update(const Eigen::Vector3d& _targetPosition) {
   // x, dx, ddxref
   Eigen::Vector3d xEEL = mLeftEndEffector->getTransform().translation();
   Eigen::Vector3d dxEEL = mLeftEndEffector->getLinearVelocity();
-  Eigen::Vector3d ddxEELref = -mKp*(xEEL - xEEref) - mKv*dxEEL;
+  Eigen::Vector3d ddxEELref = -mKp*(xEEL - xEErefL) - mKv*dxEEL;
 
   // Jacobian
   math::LinearJacobian JEEL_small = mLeftEndEffector->getLinearJacobian(); 
@@ -227,7 +231,7 @@ void Controller::update(const Eigen::Vector3d& _targetPosition) {
   // x, dx, ddxref
   Eigen::Vector3d xEER = mRightEndEffector->getTransform().translation();
   Eigen::Vector3d dxEER = mRightEndEffector->getLinearVelocity();
-  Eigen::Vector3d ddxEERref = -mKp*(xEER - xEEref) - mKv*dxEER;
+  Eigen::Vector3d ddxEERref = -mKp*(xEER - xEErefR) - mKv*dxEER;
 
   // Jacobian
   math::LinearJacobian JEER_small = mRightEndEffector->getLinearJacobian(); 

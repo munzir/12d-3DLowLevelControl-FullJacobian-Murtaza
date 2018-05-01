@@ -42,7 +42,8 @@ MyWindow::MyWindow(Controller* _controller)
 
   // Set the initial target positon to the initial position of the end effector
   // mTargetPosition = mController->getEndEffector("right")->getTransform().translation();
-  mTargetPosition << 0.4, 0.0, 0.8;
+  mLeftTargetPosition << 0.4, 0.2, 0.8;
+  mRightTargetPosition << 0.4, -0.2, 0.8;
 }
 
 //====================================================================
@@ -56,16 +57,21 @@ void MyWindow::timeStepping() {
     const double radius = 0.6;
     Eigen::Vector3d center = Eigen::Vector3d(0.0, 0.1, 0.0);
 
-    mTargetPosition = center;
-    mTargetPosition[0] = radius * std::sin(time);
-    mTargetPosition[1] = 0.25 * radius * std::sin(time);
-    mTargetPosition[2] = radius * std::cos(time);
+    mLeftTargetPosition = center;
+    mLeftTargetPosition[0] = radius * std::sin(time);
+    mLeftTargetPosition[1] = 0.25 * radius * std::sin(time);
+    mLeftTargetPosition[2] = radius * std::cos(time);
+
+    mRightTargetPosition = center;
+    mRightTargetPosition[0] = radius * std::sin(time);
+    mRightTargetPosition[1] = 0.25 * radius * std::sin(time);
+    mRightTargetPosition[2] = radius * std::cos(time);
 
     time += dt;
   }
 
   // Update the controller and apply control force to the robot
-  mController->update(mTargetPosition);
+  mController->update(mLeftTargetPosition,mRightTargetPosition);
 
   // Step forward the simulation
   mWorld->step();
@@ -84,9 +90,17 @@ void MyWindow::drawWorld() const {
     mRI->pushMatrix();
     mRI->translate( \
       (mController->mRobot->getPositions()).segment(3,3) \
-      + Tf0.matrix().block<3, 3>(0, 0)*mTargetPosition);
+      + Tf0.matrix().block<3, 3>(0, 0)*mLeftTargetPosition);
     mRI->drawEllipsoid(Eigen::Vector3d(0.05, 0.05, 0.05));
     mRI->popMatrix();    
+
+    mRI->setPenColor(Eigen::Vector3d(0.6, 0.4, 0.2));
+    mRI->pushMatrix();
+    mRI->translate( \
+      (mController->mRobot->getPositions()).segment(3,3) \
+      + Tf0.matrix().block<3, 3>(0, 0)*mRightTargetPosition);
+    mRI->drawEllipsoid(Eigen::Vector3d(0.05, 0.05, 0.05));
+    mRI->popMatrix();   
 
     mRI->setPenColor(Eigen::Vector3d(0.2, 0.2, 0.8));
     mRI->pushMatrix();
@@ -94,6 +108,7 @@ void MyWindow::drawWorld() const {
     mRI->drawEllipsoid(Eigen::Vector3d(0.05, 0.05, 0.05));
     mRI->popMatrix();    
     
+
   }
 
   // Draw world
@@ -116,22 +131,40 @@ void MyWindow::keyboard(unsigned char _key, int _x, int _y) {
       }
       break;
     case 'q':
-      mTargetPosition[0] -= incremental;
+      mLeftTargetPosition[0] -= incremental;
       break;
     case 'w':
-      mTargetPosition[0] += incremental;
+      mLeftTargetPosition[0] += incremental;
       break;
     case 'a':
-      mTargetPosition[1] -= incremental;
+      mLeftTargetPosition[1] -= incremental;
       break;
     case 's':
-      mTargetPosition[1] += incremental;
+      mLeftTargetPosition[1] += incremental;
       break;
     case 'z':
-      mTargetPosition[2] -= incremental;
+      mLeftTargetPosition[2] -= incremental;
       break;
     case 'x':
-      mTargetPosition[2] += incremental;
+      mLeftTargetPosition[2] += incremental;
+      break;
+    case 'r':
+      mRightTargetPosition[0] -= incremental;
+      break;
+    case 't':
+      mRightTargetPosition[0] += incremental;
+      break;
+    case 'f':
+      mRightTargetPosition[1] -= incremental;
+      break;
+    case 'g':
+      mRightTargetPosition[1] += incremental;
+      break;
+    case 'v':
+      mRightTargetPosition[2] -= incremental;
+      break;
+    case 'b':
+      mRightTargetPosition[2] += incremental;
       break;
     default:
       // Default keyboard control

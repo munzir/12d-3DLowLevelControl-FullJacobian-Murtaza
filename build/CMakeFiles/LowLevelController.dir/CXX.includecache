@@ -6,15 +6,15 @@
 
 #IncludeRegexTransform: 
 
-/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/Controller.cpp
+/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/Controller.cpp
 Controller.hpp
-/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/Controller.hpp
+/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/Controller.hpp
 nlopt.hpp
 -
 string
 -
 
-/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/Controller.hpp
+/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/Controller.hpp
 Eigen/Eigen
 -
 string
@@ -24,7 +24,7 @@ dart/dart.hpp
 boost/circular_buffer.hpp
 -
 
-/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/Main.cpp
+/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/Main.cpp
 dart/dart.hpp
 -
 dart/utils/urdf/urdf.hpp
@@ -36,21 +36,21 @@ fstream
 nlopt.hpp
 -
 MyWindow.hpp
-/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/MyWindow.hpp
+/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/MyWindow.hpp
 
-/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/MyWindow.cpp
+/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/MyWindow.cpp
 MyWindow.hpp
-/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/MyWindow.hpp
+/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/MyWindow.hpp
 iostream
 -
 
-/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/MyWindow.hpp
+/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/MyWindow.hpp
 dart/dart.hpp
 -
 dart/gui/gui.hpp
 -
 Controller.hpp
-/home/krang/dart/12cSpeedReg/12c-3DLowLevelControl-FullJacobian/Controller.hpp
+/home/krang/dart/12d-3DLowLevelControl-FullJacobian-Murtaza/Controller.hpp
 
 /usr/include/eigen3/Eigen/Cholesky
 Core

@@ -73,7 +73,7 @@ public:
   virtual ~Controller();
 
   /// \brief
-  void update(const Eigen::Vector3d& _targetPosition);
+  void update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::Vector3d& _RighttargetPosition);
 
   /// \brief Get robot
   dart::dynamics::SkeletonPtr getRobot() const;
