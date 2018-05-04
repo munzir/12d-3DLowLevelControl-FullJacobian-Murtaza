@@ -42,8 +42,8 @@ MyWindow::MyWindow(Controller* _controller)
 
   // Set the initial target positon to the initial position of the end effector
   // mTargetPosition = mController->getEndEffector("right")->getTransform().translation();
-  mLeftTargetPosition << 0.4, 0.2, 0.8;
-  mRightTargetPosition << 0.4, -0.2, 0.8;
+  mLeftTargetPosition << 0.3, 0.1, 0.6;
+  mRightTargetPosition << 0.4, -0.1, 0.9;
 }
 
 //====================================================================
@@ -94,7 +94,7 @@ void MyWindow::drawWorld() const {
     mRI->drawEllipsoid(Eigen::Vector3d(0.05, 0.05, 0.05));
     mRI->popMatrix();    
 
-    mRI->setPenColor(Eigen::Vector3d(0.6, 0.4, 0.2));
+    mRI->setPenColor(Eigen::Vector3d(0.0, 0.4, 0.2));
     mRI->pushMatrix();
     mRI->translate( \
       (mController->mRobot->getPositions()).segment(3,3) \
@@ -148,22 +148,22 @@ void MyWindow::keyboard(unsigned char _key, int _x, int _y) {
     case 'x':
       mLeftTargetPosition[2] += incremental;
       break;
-    case 'r':
+    case 't':
       mRightTargetPosition[0] -= incremental;
       break;
-    case 't':
+    case 'y':
       mRightTargetPosition[0] += incremental;
       break;
-    case 'f':
+    case 'g':
       mRightTargetPosition[1] -= incremental;
       break;
-    case 'g':
+    case 'h':
       mRightTargetPosition[1] += incremental;
       break;
-    case 'v':
+    case 'b':
       mRightTargetPosition[2] -= incremental;
       break;
-    case 'b':
+    case 'n':
       mRightTargetPosition[2] += incremental;
       break;
     default:
