@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/LowLevelController.dir/Controller.cpp.o"
   "CMakeFiles/LowLevelController.dir/MyWindow.cpp.o"
+  "CMakeFiles/LowLevelController.dir/Controller.cpp.o"
   "CMakeFiles/LowLevelController.dir/Main.cpp.o"
   "LowLevelController.pdb"
   "LowLevelController"
