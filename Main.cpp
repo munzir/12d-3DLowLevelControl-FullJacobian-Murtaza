@@ -91,7 +91,7 @@ dart::dynamics::SkeletonPtr createKrang() {
   // Load the Skeleton from a file
   dart::utils::DartLoader loader;
   dart::dynamics::SkeletonPtr krang =
-      loader.parseSkeleton("/home/krang/dart/09-URDF/Krang/Krang.urdf");
+      loader.parseSkeleton("/home/panda/myfolder/wholebodycontrol/09-URDF/Krang/Krang.urdf");
   krang->setName("krang");
 
   // Initiale pose parameters

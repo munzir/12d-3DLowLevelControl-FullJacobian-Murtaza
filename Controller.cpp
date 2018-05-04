@@ -156,12 +156,12 @@ void Controller::update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::
   Eigen::VectorXd dq = dqFilt->average;
   // cout << "The size of q = " << q.rows() << "*" << q.cols() << endl;
   double wEER = 0.01, wEEL = 0.01, wSpeedReg = 0.001, wReg = 0.001, wPose = 0.01, wxdotReg = 0.01, wpsidotReg = 0.01; 
-  Eigen::DiagonalMatrix<double, 3> wBal(10.0, 0.0, 1.0);
-  double KpxCOM = 75.0*0, KvxCOM = 25.0;
+  Eigen::DiagonalMatrix<double, 3> wBal(10.0, 0.0, 1.0); //(-5 0 0)
+  double KpxCOM = 15.0, KvxCOM = 2.0;
   double KvSpeedReg = 10; // Speed Reg
   double KpPose = 10.0, KvPose = 20.0;
-  double kdxdotReg = 10;
-  double kpsidotReg = 20;
+  double kdxdotReg = 20;
+  double kpsidotReg = 250;
   Eigen::Matrix<double, 4, 4> baseTf = mRobot->getBodyNode(0)->getTransform().matrix();
   Eigen::Vector3d xyz0 = q.segment(3,3); // position of frame 0 in the world frame represented in the world frame
   Eigen::Vector3d dxyz0 = baseTf.matrix().block<3,3>(0,0)*dq.segment(3,3); // velocity of frame 0 in the world frame represented in the world frame
