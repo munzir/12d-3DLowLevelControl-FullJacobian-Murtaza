@@ -64,6 +64,10 @@ Controller::Controller(dart::dynamics::SkeletonPtr _robot,
   
   qInit = mRobot->getPositions();
 
+  Eigen::Matrix<double, 4, 4> baseTf = mRobot->getBodyNode(0)->getTransform().matrix();
+  psiInit =  atan2(baseTf(0,0), -baseTf(1,0));
+
+
   Eigen::Vector3d bodyCOM = ( \
     mRobot->getMass()*mRobot->getCOM() - mLWheel->getMass()*mLWheel->getCOM() - mRWheel->getMass()*mLWheel->getCOM()) \
     /(mRobot->getMass() - mLWheel->getMass() - mRWheel->getMass());
@@ -155,13 +159,13 @@ void Controller::update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::
   dqFilt->AddSample(dqUnFilt);
   Eigen::VectorXd dq = dqFilt->average;
   // cout << "The size of q = " << q.rows() << "*" << q.cols() << endl;
-  double wEER = 0.01, wEEL = 0.01, wSpeedReg = 0.001, wReg = 0.001, wPose = 0.01, wxdotReg = 0.01, wpsidotReg = 0.01; 
+  double wEER = 0.01, wEEL = 0.01, wSpeedReg = 0.001, wReg = 0.001, wPose = 0.01, whead = 0.0, wspin = 0.01; 
   Eigen::DiagonalMatrix<double, 3> wBal(10.0, 0.0, 1.0); //(-5 0 0)
   double KpxCOM = 15.0, KvxCOM = 2.0;
   double KvSpeedReg = 10; // Speed Reg
   double KpPose = 10.0, KvPose = 20.0;
-  double kdxdotReg = 20;
-  double kpsidotReg = 250;
+  double Kvhead = 1.50;
+  double Kpspin = 0.0, Kvspin = 120;
   Eigen::Matrix<double, 4, 4> baseTf = mRobot->getBodyNode(0)->getTransform().matrix();
   Eigen::Vector3d xyz0 = q.segment(3,3); // position of frame 0 in the world frame represented in the world frame
   Eigen::Vector3d dxyz0 = baseTf.matrix().block<3,3>(0,0)*dq.segment(3,3); // velocity of frame 0 in the world frame represented in the world frame
@@ -186,7 +190,7 @@ void Controller::update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::
   }
 
   // Derivative of Rot0
-  double dpsi = 0;//(baseTf.block<3,3>(0,0) * dq.head(3))(2);
+  double dpsi = (baseTf.block<3,3>(0,0) * dq.head(3))(2);
   Eigen::Matrix<double, 3, 3> dRot0;
   dRot0 << (-sin(psi)*dpsi), (cos(psi)*dpsi), 0,
            (-cos(psi)*dpsi), (-sin(psi)*dpsi), 0,
@@ -194,7 +198,9 @@ void Controller::update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::
   
   // xEEref
   Eigen::VectorXd xEErefL = xyz0 + Rot0.transpose()*_LefttargetPosition;
+  // Eigen::VectorXd xEErefL = _LefttargetPosition;
   Eigen::VectorXd xEErefR = xyz0 + Rot0.transpose()*_RighttargetPosition;
+  // Eigen::VectorXd xEErefR = _RighttargetPosition;
   if(mSteps == 1) { 
     cout << "xEErefL: " << xEErefL(0) << ", " << xEErefL(1) << ", " << xEErefL(2) << endl;
     cout << "xEErefR: " << xEErefR(0) << ", " << xEErefR(1) << ", " << xEErefR(2) << endl;
@@ -300,7 +306,10 @@ void Controller::update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::
   Eigen::Matrix<double, 30, 1> bSpeedReg; 
   bSpeedReg << -KvSpeedReg*dq, 0, 0, 0, 0, 0;
   bSpeedReg = wMatSpeedReg*bSpeedReg;
-  
+
+
+
+
   // ***************************** Regulator
   Eigen::MatrixXd wMatReg = Eigen::MatrixXd::Identity(30, 30);
   wMatReg(0,0) = 0; // Base Link Pitch
@@ -341,16 +350,16 @@ void Controller::update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::
   Eigen::Matrix<double, 1, 24> zero24Rows;
   zero19Rows = Eigen::MatrixXd::Zero(1, 19);
   zero24Rows = Eigen::MatrixXd::Zero(1, 24);
-  Eigen::Matrix<double, 1, 30> PxdotReg;
-  Eigen::Matrix<double, 1, 25> dJxdotReg;
-  PxdotReg << 0,0,0,0, wxdotReg*sin(qBody1), wxdotReg*-cos(qBody1), zero24Rows;
-  // cout << "PxdotReg = " << PxdotReg<<endl;
-  dJxdotReg << 0,0,0,0, cos(qBody1)*dqBody1, sin(qBody1)*dqBody1, zero19Rows;
-  // cout << "dJxdotReg = " << dJxdotReg<<endl;
-  double xdotref = 0;
-  
-  Eigen::Matrix<double, 1, 1> bxdotReg;
-  bxdotReg << -wxdotReg*(kdxdotReg*dJxdotReg*dq - xdotref);
+  Eigen::Matrix<double, 1, 25> Jhead;
+  Jhead << 0,0,0,0, sin(qBody1), -cos(qBody1), zero19Rows;
+  Eigen::Matrix<double, 1, 30> Phead;
+  Phead << whead*Jhead, 0, 0, 0, 0, 0;
+  Eigen::Matrix<double, 1, 25> dJhead;
+  dJhead << 0,0,0,0, cos(qBody1)*dqBody1, sin(qBody1)*dqBody1, zero19Rows;
+  double dx = Jhead*dq;
+  double ddxref = -Kvhead*dx;
+  Eigen::Matrix<double, 1, 1> bhead;
+  bhead << whead*(-dJhead*dq + ddxref);
 
 
   //********************************Psi Regulator
@@ -358,16 +367,15 @@ void Controller::update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::
   Eigen::Matrix<double, 1, 27> zero27Rows;
   zero22Rows = Eigen::MatrixXd::Zero(1, 22);
   zero27Rows = Eigen::MatrixXd::Zero(1, 27);
-  Eigen::Matrix<double, 1, 30> PpsidotReg;
-  Eigen::Matrix<double, 1, 25> dJpsidotReg;
-  PpsidotReg << 0,wxdotReg*cos(qBody1), wxdotReg*sin(qBody1), zero27Rows;
-  // cout << "PxdotReg = " << PxdotReg<<endl;
-  dJpsidotReg << 0,-sin(qBody1)*dqBody1, cos(qBody1)*dqBody1, zero22Rows;
-  // cout << "dJxdotReg = " << dJxdotReg<<endl;
-  double psidotref = 0;
-  
-  Eigen::Matrix<double, 1, 1> bpsidotReg;
-  bxdotReg << -wpsidotReg*(kpsidotReg*dJxdotReg*dq - psidotref);
+  Eigen::Matrix<double, 1, 25> Jspin;
+  Jspin << 0, cos(qBody1), sin(qBody1), zero22Rows;
+  Eigen::Matrix<double, 1, 30> Pspin;
+  Pspin << wspin*Jspin, 0, 0, 0, 0, 0;
+  Eigen::Matrix<double, 1, 25> dJspin;
+  dJspin << 0,-sin(qBody1)*dqBody1, cos(qBody1)*dqBody1, zero22Rows;
+  double ddpsiref = -Kpspin*(psi - psiInit) - Kvspin*dpsi;  
+  Eigen::Matrix<double, 1, 1> bspin;
+  bspin << wspin*(-dJspin*dq + ddpsiref);
 
 
   // ***************************** Inertia and Coriolis Matrices
@@ -392,35 +400,37 @@ void Controller::update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::
     cout << "PPose: " << PPose.rows() << " x " << PPose.cols() << endl;
     cout << "PSpeedReg: " << PSpeedReg.rows() << " x " << PSpeedReg.cols() << endl;
     cout << "PReg: " << PReg.rows() << " x " << PReg.cols() << endl;
-    cout << "PxdotReg: " << PxdotReg.rows() << " x " << PxdotReg.cols() << endl;
+    cout << "Phead: " << Phead.rows() << " x " << Phead.cols() << endl;
+    cout << "Pspin: " << Pspin.rows() << " x " << Pspin.cols() << endl;
     cout << "bEER: " << bEER.rows() << " x " << bEER.cols() << endl;
     cout << "bEEL: " << bEEL.rows() << " x " << bEEL.cols() << endl;
     cout << "bBal: " << bBal.rows() << " x " << bBal.cols() << endl;
     cout << "bPose: " << bPose.rows() << " x " << bPose.cols() << endl;
     cout << "bSpeedReg: " << bSpeedReg.rows() << " x " << bSpeedReg.cols() << endl;
     cout << "bReg: " << bReg.rows() << " x " << bReg.cols() << endl;
-    cout << "bxdotReg: " << bxdotReg.rows() << " x " << bxdotReg.cols() << endl;
+    cout << "bhead: " << bhead.rows() << " x " << bhead.cols() << endl;
+    cout << "bspin: " << bspin.rows() << " x " << bspin.cols() << endl;
   }
 
-  Eigen::MatrixXd P(PEER.rows() + PEEL.rows() + PBal.rows() + PPose.rows() + PSpeedReg.rows() + PReg.rows() + PxdotReg.rows() + PpsidotReg.rows() , PEER.cols() );
+  Eigen::MatrixXd P(PEER.rows() + PEEL.rows() + PBal.rows() + PPose.rows() + PSpeedReg.rows() + PReg.rows() + Phead.rows() + Pspin.rows() , PEER.cols() );
   P << PEER,
        PEEL,
        PBal,
        PPose,
        PSpeedReg,
        PReg,
-       PxdotReg,
-       PpsidotReg;
+       Phead,
+       Pspin;
 
-  Eigen::VectorXd b(bEER.rows() + bEEL.rows() + bBal.rows() + bPose.rows() + bSpeedReg.rows() + bReg.rows() + bxdotReg.rows() + bpsidotReg.rows(), bEER.cols() );
+  Eigen::VectorXd b(bEER.rows() + bEEL.rows() + bBal.rows() + bPose.rows() + bSpeedReg.rows() + bReg.rows() + bhead.rows() + bspin.rows(), bEER.cols() );
   b << bEER,
        bEEL,
        bBal,
        bPose,
        bSpeedReg,
        bReg,
-       bxdotReg,
-       bpsidotReg;
+       bhead,
+       bspin;
 
   optParams.P = P;
   optParams.b = b;
@@ -512,8 +522,8 @@ void Controller::update(const Eigen::Vector3d& _LefttargetPosition,const Eigen::
     cout << "Pose loss: " << pow((PPose*ddq_lambda-bPose).norm(), 2) << endl;
     cout << "Speed Reg loss: " << pow((PSpeedReg*ddq_lambda-bSpeedReg).norm(), 2) << endl;
     cout << "Reg loss: " << pow((PReg*ddq_lambda-bReg).norm(), 2) << endl;
-    cout << "xdot loss: " << pow((PxdotReg*ddq_lambda-bxdotReg).norm(), 2) << endl;
-    cout << "psidot loss: " << pow((PpsidotReg*ddq_lambda-bpsidotReg).norm(), 2) << endl;
+    cout << "Heading loss: " << pow((Phead*ddq_lambda-bhead).norm(), 2) << endl;
+    cout << "Spin loss: " << pow((Pspin*ddq_lambda-bspin).norm(), 2) << endl;
     cout << "Equality: "; for(int i=0; i<6; i++) {cout << (P_*ddq_lambda-b_)(i) << ", ";} cout << endl << endl << endl;
   }
   const vector<size_t > index{6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
