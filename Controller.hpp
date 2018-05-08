@@ -115,6 +115,8 @@ public:
   Eigen::Matrix<double, 25, 1> qInit;
 
   filter *dqFilt;
+
+  double psiInit;
 };
 
 #endif  // EXAMPLES_OPERATIONALSPACECONTROL_CONTROLLER_HPP_

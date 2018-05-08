@@ -42,8 +42,8 @@ MyWindow::MyWindow(Controller* _controller)
 
   // Set the initial target positon to the initial position of the end effector
   // mTargetPosition = mController->getEndEffector("right")->getTransform().translation();
-  mLeftTargetPosition << 0.3, 0.1, 0.6;
-  mRightTargetPosition << 0.4, -0.1, 0.9;
+  mLeftTargetPosition << 0.4, 0.2, 0.6;
+  mRightTargetPosition << 0.4, -0.2, 0.9;
 }
 
 //====================================================================
@@ -91,6 +91,7 @@ void MyWindow::drawWorld() const {
     mRI->translate( \
       (mController->mRobot->getPositions()).segment(3,3) \
       + Tf0.matrix().block<3, 3>(0, 0)*mLeftTargetPosition);
+    // mRI->translate(mLeftTargetPosition);
     mRI->drawEllipsoid(Eigen::Vector3d(0.05, 0.05, 0.05));
     mRI->popMatrix();    
 
@@ -99,6 +100,7 @@ void MyWindow::drawWorld() const {
     mRI->translate( \
       (mController->mRobot->getPositions()).segment(3,3) \
       + Tf0.matrix().block<3, 3>(0, 0)*mRightTargetPosition);
+    // mRI->translate(mRightTargetPosition);
     mRI->drawEllipsoid(Eigen::Vector3d(0.05, 0.05, 0.05));
     mRI->popMatrix();   
 
